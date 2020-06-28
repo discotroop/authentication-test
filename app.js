@@ -33,6 +33,7 @@ app.set("views", __dirname);
 app.set("view engine", "ejs");
 
 // local strategy for authentication:
+// called by passport.authenticate()
 passport.use(
     new LocalStrategy((username, password, done) => {
         // look for user in db
@@ -55,15 +56,40 @@ passport.use(
     })
   );
 
+// Handle cookies for user persistance over time
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+  
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
+// Pass user around by attaching to locals object
+app.use(function(req, res, next) {
+  res.locals.currentUser = req.user;
+  next();
+});
 
-// Routes
-app.get("/", (req, res) => res.render("index"));
+
+// Routes on GET
+app.get("/", (req, res) => {
+  res.render("index", { user: req.user});
+});
 app.get("/sign-up", (req, res) => res.render("sign-up-form"));
+app.get("/log-out", (req, res) => {
+  req.logout();
+  res.redirect("/");
+});
+
+// Routes on POST
 
 // Handle POST on sign up
 app.post("/sign-up", (req, res, next) => {
@@ -75,6 +101,15 @@ app.post("/sign-up", (req, res, next) => {
     res.redirect("/");
     });
 });
+
+// Handle POST on login
+app.post(
+  "/log-in",
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/"
+  })
+);
 
 app.listen(3000, () => console.log("app listening on port 3000!"));
 
