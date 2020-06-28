@@ -47,12 +47,19 @@ passport.use(
         if (!user) {
           return done(null, false, { msg: "Incorrect username" });
         }
-          // if pword doesn't match return incorrect password
-        if (user.password !== password) {
-          return done(null, false, { msg: "Incorrect password" });
-        }
+        // check passed pword versus bcrypt hashed pword
+        bcrypt.compare(password, user.password, (err, res) => {
+          if (res) {
+            // passwords match! log user in
+            console.log("pwords", password, user.password)
+            return done(null, user)
+          } else {
+            // passwords do not match!
+            return done(null, false, {msg: "Incorrect password"})
+          }
+        })
           // ?
-        return done(null, user);
+        // return done(null, user);
       });
     })
   );
@@ -94,9 +101,12 @@ app.get("/log-out", (req, res) => {
 
 // Handle POST on sign up
 app.post("/sign-up", (req, res, next) => {
+  // hash pword
   bcrypt.hash("somePassword", 10, (err, hashedPassword) => {
+    // if err stop
     if (err) { return next(err); }
     else {
+    // create user and pass in hashedPassword
     const user = new User({
         username: req.body.username,
         password: hashedPassword
