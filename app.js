@@ -11,6 +11,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const bcrypt = require("bcryptjs");
 
 // set up db
 const mongoDB = "mongodb+srv://admin:admin@cluster0-c2h9p.mongodb.net/authentication1?retryWrites=true&w=majority";
@@ -93,13 +94,18 @@ app.get("/log-out", (req, res) => {
 
 // Handle POST on sign up
 app.post("/sign-up", (req, res, next) => {
+  bcrypt.hash("somePassword", 10, (err, hashedPassword) => {
+    if (err) { return next(err); }
+    else {
     const user = new User({
         username: req.body.username,
-        password: req.body.password
+        password: hashedPassword
     }).save(err => {
         if(err) { return next(err)};
     res.redirect("/");
     });
+  }
+  });
 });
 
 // Handle POST on login
