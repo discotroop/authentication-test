@@ -32,6 +32,29 @@ const app = express();
 app.set("views", __dirname);
 app.set("view engine", "ejs");
 
+// local strategy for authentication:
+passport.use(
+    new LocalStrategy((username, password, done) => {
+        // look for user in db
+      User.findOne({ username: username }, (err, user) => {
+          // if err then err
+        if (err) { 
+          return done(err);
+        };
+          // if no match return incorrect name
+        if (!user) {
+          return done(null, false, { msg: "Incorrect username" });
+        }
+          // if pword doesn't match return incorrect password
+        if (user.password !== password) {
+          return done(null, false, { msg: "Incorrect password" });
+        }
+          // ?
+        return done(null, user);
+      });
+    })
+  );
+
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
