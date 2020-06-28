@@ -48,6 +48,7 @@ passport.use(
           return done(null, false, { msg: "Incorrect username" });
         }
         // check passed pword versus bcrypt hashed pword
+        // this is broken? 
         bcrypt.compare(password, user.password, (err, res) => {
           if (res) {
             // passwords match! log user in
@@ -57,12 +58,10 @@ passport.use(
             // passwords do not match!
             return done(null, false, {msg: "Incorrect password"})
           }
-        })
-          // ?
-        // return done(null, user);
+        });
       });
     })
-  );
+);
 
 // Handle cookies for user persistance over time
 passport.serializeUser(function(user, done) {
@@ -89,7 +88,7 @@ app.use(function(req, res, next) {
 
 // Routes on GET
 app.get("/", (req, res) => {
-  res.render("index", { user: req.user});
+  res.render("index", { user: req.locals.currentUser});
 });
 app.get("/sign-up", (req, res) => res.render("sign-up-form"));
 app.get("/log-out", (req, res) => {
