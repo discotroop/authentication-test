@@ -1,3 +1,4 @@
+// node app.js to run
 
 // mongodb+srv://admin:<password>@cluster0-c2h9p.mongodb.net/<dbname>?retryWrites=true&w=majority
 // mongodb+srv://admin:admin@cluster0-c2h9p.mongodb.net/authentication1?retryWrites=true&w=majority
@@ -36,7 +37,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
+
+// Routes
 app.get("/", (req, res) => res.render("index"));
+app.get("/sign-up", (req, res) => res.render("sign-up-form"));
+
+// Handle POST on sign up
+app.post("/sign-up", (req, res, next) => {
+    const user = new User({
+        username: req.body.username,
+        password: req.body.password
+    }).save(err => {
+        if(err) { return next(err)};
+    res.redirect("/");
+    });
+});
 
 app.listen(3000, () => console.log("app listening on port 3000!"));
 

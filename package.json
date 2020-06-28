@@ -4,7 +4,11 @@
   "description": "testing passportjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/www",
+    "devstart": "nodemon ./bin/www",
+    "serverstart": "DEBUG=express-locallibrary:* npm run devstart",
+    "populatedb": "node populatedb mongodb+srv://libraryUser:libraryAdmin@librarydb-b67ux.mongodb.net/local_library?retryWrites=true&w=majority"
   },
   "repository": {
     "type": "git",
