@@ -32,6 +32,8 @@ const app = express();
 app.set("views", __dirname);
 app.set("view engine", "ejs");
 
+
+// http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
 passport.use(
   new LocalStrategy((username, password, done) => {
     User.findOne({ username: username }, (err, user) => {
@@ -42,6 +44,7 @@ passport.use(
       user.comparePassword("1" , function(err, isMatch) {
         if (err) { console.log(err)}
         console.log("compare", password, isMatch, user.password)
+        return;
       });
     });
   })
@@ -97,28 +100,23 @@ app.get("/", (req, res) => res.render("index", {user: req.user }));
 app.get("/sign-up", (req, res) => res.render("sign-up-form"));
 
 app.post("/sign-up", (req, res, next) => {
-  bcrypt.hash("somePassword", 3, function (err, hashedPassword) {
-    if(err) {console.log(err)}
-    // if err, do something
-    // otherwise, store hashedPassword in DB
     const user = new User({
       username: req.body.username,
-      password: hashedPassword
+      password: req.body.password
     }).save(err => {
       if (err) { 
         return next(err);
       };
-      console.log(hashedPassword)
+      console.log(req.body.password)
       res.redirect("/");
     });
-  });
 });
 
 app.post(
   "/login",
   passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/"
+    successRedirect: "/smelly",
+    failureRedirect: "/fail"
   })
 );
 
