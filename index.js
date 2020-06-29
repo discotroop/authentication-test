@@ -39,13 +39,9 @@ passport.use(
         console.log(err)
         return done(err);
       };
-      if (!user) {
-        console.log("no user")
-        return done(null, false, { msg: "Incorrect username" });
-      }
-      user.comparePassword(password, function(err, isMatch) {
+      user.comparePassword("1" , function(err, isMatch) {
         if (err) { console.log(err)}
-        console.log(password, isMatch)
+        console.log("compare", password, isMatch, user.password)
       });
     });
   })
@@ -60,6 +56,35 @@ passport.deserializeUser(function(id, done) {
     done(err, user);
   });
 });
+
+// // create a user a new user
+// var testUser = new User({
+//   username: 'f',
+//   password: 'a'
+// });
+
+// let newpassword = "a";
+// // save user to database
+// testUser.save(function(err) {
+//   if (err) throw err;
+
+//   // fetch user and test password verification
+//   User.findOne({ username: testUser.username }, function(err, user) {
+//       if (err) throw err;
+
+//       // test a matching password
+//       user.comparePassword(newpassword , function(err, isMatch) {
+//           if (err) throw err;
+//           console.log('Password123:', isMatch); // -> Password123: true
+//       });
+
+//       // test a failing password
+//       user.comparePassword('123Password', function(err, isMatch) {
+//           if (err) throw err;
+//           console.log('123Password:', isMatch); // -> 123Password: false
+//       });
+//   });
+// });
 
 
 
