@@ -10,13 +10,15 @@
     <a href="/log-out">LOG OUT</a>
   <% } else { %>
     <h1>please log in</h1>
-    <form action="/log-in" method="POST">
+    <form action="/login" method="POST">
       <label for="username">Username</label>
       <input name="username" placeholder="username" type="text" />
       <label for="password">Password</label>
       <input name="password" type="password" />
       <button>Log In</button>
     </form>
+
+    <a href="/sign-up"> Sign Up </a>
   <%}%>
 
 </body>
