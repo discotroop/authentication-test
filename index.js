@@ -13,19 +13,20 @@ const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
+let User = require("./modules/user");
 
 const mongoDb = "mongodb+srv://admin:admin@cluster0-c2h9p.mongodb.net/authentication1?retryWrites=true&w=majority";
 mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongo connection error"));
 
-const User = mongoose.model(
-  "User",
-  new Schema({
-    username: { type: String, required: true },
-    password: { type: String, required: true }
-  })
-);
+// const User = mongoose.model(
+//   "User",
+//   new Schema({
+//     username: { type: String, required: true },
+//     password: { type: String, required: true }
+//   })
+// );
 
 const app = express();
 app.set("views", __dirname);
@@ -42,22 +43,10 @@ passport.use(
         console.log("no user")
         return done(null, false, { msg: "Incorrect username" });
       }
-      if (password) {
-        console.log(password, user.password)
-      bcrypt.compare(password, user.password, function(err, results) {
-        console.log(results)
-        // This is WRONG!! why ?
-        if (!results) {
-          // passwords match! log user in
-          console.log(results)
-          return done(null, user)
-        } else {
-          console.log("fuck you bcrypt")
-          // passwords do not match!
-          //return done(null, false, {msg: "Incorrect password"})
-        }
-      })
-    }
+      user.comparePassword(password, function(err, isMatch) {
+        if (err) { console.log(err)}
+        console.log(password, isMatch)
+      });
     });
   })
 );
